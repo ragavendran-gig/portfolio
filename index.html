@@ -1,423 +1,485 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ragavendran S — SDET / Automation Engineer</title>
-  <meta name="description" content="Interactive online résumé for Ragavendran S — SDET / Automation Engineer. Skills in Java, REST Assured, Selenium, Cucumber, Playwright, Appium, CI/CD and more." />
-  <meta property="og:title" content="Ragavendran S — SDET / Automation Engineer" />
-  <meta property="og:description" content="Interactive, colorful résumé hosted on GitHub Pages." />
-  <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#4f46e5" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg: #0b1020;           /* default: Indigo Night */
-      --panel:#0f1530;
-      --card:#131a3a;
-      --text:#f4f6ff;
-      --muted:#c6c9f4;
-      --accent:#7c3aed;        /* primary */
-      --accent-2:#22d3ee;      /* secondary */
-      --chip:#222a55;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-    /* Light theme variables (auto switched) */
-    .theme-light{
-      --bg:#f8fafc; --panel:#ffffff; --card:#ffffff; --text:#0b1324; --muted:#475569; --chip:#f1f5f9;
-      --accent:#2563eb; --accent-2:#06b6d4;
-    }
-    /* Alternate accent presets */
-    .theme-green{ --accent:#16a34a; --accent-2:#22d3ee; }
-    .theme-rose{ --accent:#e11d48; --accent-2:#8b5cf6; }
-    .theme-amber{ --accent:#f59e0b; --accent-2:#06b6d4; }
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Download, Mail, Phone, MapPin, Github, Linkedin, Globe, Sparkles, Printer, Moon, Sun, Star, ChevronDown } from "lucide-react";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(1200px 800px at 85% -10%,rgba(124,58,237,.18),transparent),radial-gradient(900px 600px at -10% 10%,rgba(34,211,238,.14),transparent),var(--bg);color:var(--text);line-height:1.6}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
+/**
+ * Interactive Resume – single-file React component.
+ * - Playful but professional animations
+ * - Theme toggle (light/dark)
+ * - Fun Easter egg (shooting stars on hover)
+ * - Skill chart (Recharts)
+ * - Collapsible sections + keyboard navigation
+ * - Print-friendly (@media print) with auto-collapse and simplified colors
+ *
+ * How to use on GitHub Pages quickly:
+ * 1) Create a new repo (e.g., interactive-resume) with a Vite + React setup
+ *    `npm create vite@latest resume -- --template react` then replace App.jsx with this file’s default export usage
+ * 2) Add Tailwind CSS (tailwind docs) and include the classes as in this file
+ * 3) Deploy to Pages (Settings → Pages) or use `npm run deploy` via gh-pages
+ */
 
-    .container{max-width:1000px;margin:0 auto;padding:28px}
-    header{position:sticky;top:0;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,0)),var(--panel);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08);z-index:10}
-    .topbar{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:12px 28px}
-    .brand{display:flex;gap:14px;align-items:center}
-    .avatar{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:var(--shadow)}
-    .nav{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{padding:8px 12px;border-radius:999px;background:var(--chip);color:var(--text);border:1px solid rgba(255,255,255,.07);cursor:pointer;font-size:13px}
-    .chip[aria-current="page"], .chip.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white}
+// Small helper for class concatenation
+const cx = (...a) => a.filter(Boolean).join(" ");
 
-    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;margin-top:18px}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);border-radius:20px;box-shadow:var(--shadow)}
-    .hero .card{padding:22px}
-    .title{font-size:38px;line-height:1.15;margin:6px 0 8px}
-    .subtitle{font-size:18px;color:var(--muted);margin:0 0 8px}
-    .contact{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:var(--card);color:var(--text);cursor:pointer}
-    .btn:hover{transform:translateY(-1px)}
-    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
-
-    .section{margin:26px 0;padding:22px}
-    .section h2{margin:0 0 8px;font-size:22px}
-    .section p.lead{margin:0 0 12px;color:var(--muted)}
-
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
-    .col-12{grid-column:span 12}
-    .col-6{grid-column:span 6}
-
-    @media (max-width:860px){.hero{grid-template-columns:1fr}.col-6{grid-column:span 12}}
-
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--chip);border:1px solid rgba(255,255,255,.08);font-size:12px;margin:4px 6px 0 0}
-    .list{display:flex;flex-wrap:wrap;margin-top:8px}
-
-    .timeline{position:relative;margin:8px 0}
-    .timeline::before{content:"";position:absolute;top:0;bottom:0;left:10px;width:2px;background:linear-gradient(var(--accent),transparent)}
-    .tl-item{position:relative;padding-left:28px;margin:16px 0}
-    .tl-item::before{content:"";position:absolute;left:4px;top:6px;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 0 3px rgba(124,58,237,.15)}
-    .role{font-weight:700}
-    .org{opacity:.9}
-    .meta{font-size:12px;color:var(--muted)}
-    details.summary-card{background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.08)}
-    details.summary-card[open]{outline:1.5px solid color-mix(in oklab, var(--accent) 40%, transparent)}
-    summary{cursor:pointer;list-style:none}
-    summary::-webkit-details-marker{display:none}
-
-    .skillbar{height:10px;background:#101634;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
-    .skillbar > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
-
-    .footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:24px 0;color:var(--muted)}
-    .theme-switch{display:flex;gap:8px;align-items:center}
-    .swatch{width:26px;height:26px;border-radius:8px;cursor:pointer;border:2px solid rgba(255,255,255,.2)}
-    .swatch.indigo{background:linear-gradient(135deg,#7c3aed,#22d3ee)}
-    .swatch.green{background:linear-gradient(135deg,#16a34a,#22d3ee)}
-    .swatch.rose{background:linear-gradient(135deg,#e11d48,#8b5cf6)}
-    .swatch.amber{background:linear-gradient(135deg,#f59e0b,#06b6d4)}
-    .swatch.light{background:#fff}
-
-    /* Print to PDF friendly */
-    @media print{
-      header,.theme-switch,.btn,.nav{display:none!important}
-      body{background:#fff;color:#000}
-      .card,.section{border:1px solid #ddd}
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <div class="topbar">
-      <div class="brand">
-        <div class="avatar" aria-hidden>RS</div>
-        <div>
-          <div style="font-weight:800;letter-spacing:.2px">Ragavendran S</div>
-          <div class="meta">SDET Senior Engineer · Automation Specialist</div>
-        </div>
-      </div>
-      <nav class="nav" id="mainNav" aria-label="Primary">
-        <button class="chip active" data-target="about" aria-current="page">About</button>
-        <button class="chip" data-target="skills">Skills</button>
-        <button class="chip" data-target="experience">Experience</button>
-        <button class="chip" data-target="awards">Awards</button>
-        <button class="chip" data-target="education">Education</button>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="hero">
-      <div class="card">
-        <h1 class="title">Hi, I’m <span style="background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent">Ragavendran</span></h1>
-        <p class="subtitle">I streamline QA with thoughtful automation across API, UI and mobile — reducing toil and accelerating delivery.</p>
-        <div class="contact">
-          <a class="btn" href="tel:+918870206167">📞 +91 887-020-6167</a>
-          <a class="btn" href="mailto:iamragavendrans@gmail.com">✉️ iamragavendrans@gmail.com</a>
-          <a class="btn primary" href="https://www.linkedin.com/in/iamragavendrans" target="_blank" rel="noopener">in LinkedIn</a>
-          <button class="btn" id="copyEmail">📋 Copy Email</button>
-        </div>
-        <p style="margin:10px 0 0;color:var(--muted)">Open to roles in SDET, Test Automation, and Tools Engineering.</p>
-      </div>
-      <div class="card">
-        <div class="section" style="margin:0;padding:0">
-          <h2>Highlights</h2>
-          <ul style="margin:8px 0 0 18px">
-            <li>Boosted team efficiency by ~40% via reporting dashboards.</li>
-            <li>Eliminated repetitive vendor follow-ups with automation (~90% effort cut).</li>
-            <li>Mentored 15 engineers; SME for enterprise QA automation.</li>
-          </ul>
-          <div class="list" style="margin-top:14px">
-            <span class="pill">API & UI Automation</span>
-            <span class="pill">BDD (Cucumber)</span>
-            <span class="pill">Java · REST Assured</span>
-            <span class="pill">Selenium · Playwright · Appium</span>
-            <span class="pill">CI/CD · GitHub Actions</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="about" class="section card">
-      <h2>About</h2>
-      <p class="lead">Experienced SDET who streamlines processes and reduces manual work via automation, with strong delivery against functional requirements and cross-team collaboration.</p>
-    </section>
-
-    <section id="skills" class="section card" hidden>
-      <h2>Skills</h2>
-      <div class="grid">
-        <div class="col-6">
-          <h3>Languages & Tools</h3>
-          <div class="list">
-            <span class="pill">Java</span>
-            <span class="pill">REST Assured</span>
-            <span class="pill">Postman</span>
-            <span class="pill">SQL</span>
-            <span class="pill">Selenium</span>
-            <span class="pill">Cucumber/Gherkin</span>
-            <span class="pill">Playwright</span>
-            <span class="pill">Appium</span>
-            <span class="pill">TestNG</span>
-            <span class="pill">Maven</span>
-            <span class="pill">Jenkins</span>
-            <span class="pill">GitHub / GitLab</span>
-            <span class="pill">GitHub Actions</span>
-            <span class="pill">JMeter</span>
-            <span class="pill">Spring Boot</span>
-            <span class="pill">Microservices</span>
-            <span class="pill">BrowserStack</span>
-            <span class="pill">Power Automate</span>
-          </div>
-        </div>
-        <div class="col-6">
-          <h3>Proficiency</h3>
-          <div style="margin:10px 0">
-            <div>API Automation</div>
-            <div class="skillbar"><span style="width:92%"></span></div>
-          </div>
-          <div style="margin:10px 0">
-            <div>UI / Mobile Automation</div>
-            <div class="skillbar"><span style="width:88%"></span></div>
-          </div>
-          <div style="margin:10px 0">
-            <div>CI/CD & DevOps Collaboration</div>
-            <div class="skillbar"><span style="width:84%"></span></div>
-          </div>
-          <div style="margin:10px 0">
-            <div>Test Strategy & Mentoring</div>
-            <div class="skillbar"><span style="width:86%"></span></div>
-          </div>
-        </div>
-      </div>
-
-      <h3 style="margin-top:18px">Focus Filters</h3>
-      <div class="list" id="skillFilters">
-        <button class="pill" data-filter="api">API</button>
-        <button class="pill" data-filter="ui">UI</button>
-        <button class="pill" data-filter="mobile">Mobile</button>
-        <button class="pill" data-filter="ci">CI/CD</button>
-        <button class="pill" data-filter="bdd">BDD</button>
-        <button class="pill" data-filter="all">Show All</button>
-      </div>
-    </section>
-
-    <section id="experience" class="section card" hidden>
-      <h2>Experience</h2>
-      <div class="timeline" id="timeline">
-        <details class="summary-card tl-item" open data-tags="api ui ci bdd">
-          <summary>
-            <div class="role">SDET Automation Engineer III</div>
-            <div class="org">Comcast India Engineering Center · Chennai</div>
-            <div class="meta">Oct 2023 – Feb 2025</div>
-          </summary>
-          <ul style="margin-left:18px">
-            <li>Raised team efficiency ~40% with a reporting dashboard for third‑party issues and release notes.</li>
-            <li>Automated external coordination; reduced manual follow‑ups by ~90%.</li>
-            <li>Delivered new/major features on time; mentored 15 engineers and acted as SME.</li>
-          </ul>
-        </details>
-
-        <details class="summary-card tl-item" data-tags="api ui bdd">
-          <summary>
-            <div class="role">SDET Automation Engineer II</div>
-            <div class="org">Comcast India Engineering Center · Chennai</div>
-            <div class="meta">Jun 2022 – Sep 2023</div>
-          </summary>
-          <ul style="margin-left:18px">
-            <li>Modernized legacy framework; decreased failure rates; migrated 120+ instances.</li>
-            <li>Java + REST Assured + Cucumber covering ~50% of co‑dependent scenarios.</li>
-            <li>Built Power Automate apps; cut routine toil ~90% for a 25‑member team.</li>
-          </ul>
-        </details>
-
-        <details class="summary-card tl-item" data-tags="ui ci">
-          <summary>
-            <div class="role">Test Engineer</div>
-            <div class="org">Infosys · Chennai</div>
-            <div class="meta">Apr 2021 – Jun 2022</div>
-          </summary>
-          <ul style="margin-left:18px">
-            <li>Outperformed manual QA baseline by ~70% via process automations.</li>
-            <li>Improved automation throughput by ~12% through log‑validation function.</li>
-            <li>Maintained Git/GitHub and CI/CD operations.</li>
-          </ul>
-        </details>
-
-        <details class="summary-card tl-item" data-tags="ui">
-          <summary>
-            <div class="role">Senior Testing Executive</div>
-            <div class="org">Infosys · Chennai</div>
-            <div class="meta">Jul 2020 – Mar 2021</div>
-          </summary>
-          <ul style="margin-left:18px">
-            <li>Web UI automation for functional and regression testing using Selenium.</li>
-            <li>Defect lifecycle in Jira; authored scripts and RTM documents.</li>
-          </ul>
-        </details>
-
-        <details class="summary-card tl-item" data-tags="ui">
-          <summary>
-            <div class="role">Testing Executive</div>
-            <div class="org">Infosys · Chennai</div>
-            <div class="meta">Oct 2018 – Jun 2020</div>
-          </summary>
-          <ul style="margin-left:18px">
-            <li>Owned ~40% of STLC activities: planning, design, closure of test cases.</li>
-            <li>Manual testing & ALM test‑suite management; KT and shadow support.</li>
-          </ul>
-        </details>
-
-        <details class="summary-card tl-item" data-tags="ci">
-          <summary>
-            <div class="role">Test Lead</div>
-            <div class="org">HCL Technologies · Chennai</div>
-            <div class="meta">Mar 2025 – Apr 2025</div>
-          </summary>
-          <ul style="margin-left:18px">
-            <li>Short‑term leadership engagement; coordinated delivery and quality gates.</li>
-          </ul>
-        </details>
-      </div>
-    </section>
-
-    <section id="awards" class="section card" hidden>
-      <h2>Awards</h2>
-      <ul style="margin-left:18px">
-        <li>Sky Stars – Thanks Award (Apr 2023)</li>
-        <li>Champ Award (Feb 2022)</li>
-        <li>First Time‑Right Team Award (Mar 2021)</li>
-        <li>Rising Star 2020 (Mar 2021)</li>
-      </ul>
-    </section>
-
-    <section id="education" class="section card" hidden>
-      <h2>Education</h2>
-      <p><strong>BCA — Kalasalingam Academy of Research and Education</strong> (Jul 2015 – Apr 2018)<br>
-      First Class with Distinction; 2nd place product demo.</p>
-    </section>
-
-    <div class="footer">
-      <div>
-        <button class="btn" id="printPdf">🖨️ Save as PDF</button>
-        <button class="btn" id="downloadJson">⬇️ Export JSON</button>
-        <a class="btn" href="#about" id="backToTop">⤴ Back to top</a>
-      </div>
-      <div class="theme-switch" aria-label="Theme switcher">
-        <span class="meta">Theme:</span>
-        <div class="swatch indigo" data-theme="indigo" title="Indigo"></div>
-        <div class="swatch green" data-theme="green" title="Green"></div>
-        <div class="swatch rose" data-theme="rose" title="Rose"></div>
-        <div class="swatch amber" data-theme="amber" title="Amber"></div>
-        <div class="swatch light" data-theme="light" title="Light"></div>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    // --- Simple tab nav ---
-    const nav = document.getElementById('mainNav');
-    const sections = Array.from(document.querySelectorAll('main .section'));
-    nav.addEventListener('click', (e)=>{
-      const btn = e.target.closest('button[data-target]');
-      if(!btn) return;
-      nav.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-      btn.classList.add('active');
-      const id = btn.dataset.target;
-      sections.forEach(s=>s.hidden = s.id !== id);
-      document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
-    });
-
-    // --- Copy email ---
-    document.getElementById('copyEmail').addEventListener('click', async ()=>{
-      await navigator.clipboard.writeText('iamragavendrans@gmail.com');
-      const b = event.target; b.textContent='✅ Copied!'; setTimeout(()=>b.textContent='📋 Copy Email',1300);
-    });
-
-    // --- Print to PDF ---
-    document.getElementById('printPdf').addEventListener('click',()=>window.print());
-
-    // --- Export JSON resume ---
-    const resumeJson = {
-      name: 'Ragavendran S', title: 'SDET / Automation Engineer',
-      location: 'Chennai, India',
-      email: 'iamragavendrans@gmail.com', phone: '+91 8870206167',
-      linkedin: 'https://www.linkedin.com/in/iamragavendrans',
-      summary: 'SDET streamlining QA through automation across API/UI/mobile.',
-      skills: ['Java','REST Assured','Postman','SQL','Selenium','Cucumber','Playwright','Appium','TestNG','Maven','Jenkins','GitHub','GitLab','GitHub Actions','JMeter','Spring Boot','Microservices','BrowserStack','Power Automate'],
-      experience: [
-        { role:'SDET Automation Engineer III', org:'Comcast India Engineering Center', city:'Chennai', dates:'Oct 2023 – Feb 2025', bullets:[
-          'Team efficiency +40% with reporting dashboard',
-          'Automated external coordination (~90% effort cut)',
-          'Mentored 15 engineers; SME'
-        ]},
-        { role:'SDET Automation Engineer II', org:'Comcast India Engineering Center', city:'Chennai', dates:'Jun 2022 – Sep 2023', bullets:[
-          'Modernized framework; migrated 120+ instances',
-          'Java + REST Assured + Cucumber (~50% coverage of co-dependent)',
-          'Power Automate reduced toil ~90%'
-        ]},
-        { role:'Test Engineer', org:'Infosys', city:'Chennai', dates:'Apr 2021 – Jun 2022', bullets:[
-          'Process automations beat manual baseline by ~70%','Log-validation +12% throughput','Owned Git/CI/CD'
-        ]},
-        { role:'Senior Testing Executive', org:'Infosys', city:'Chennai', dates:'Jul 2020 – Mar 2021'},
-        { role:'Testing Executive', org:'Infosys', city:'Chennai', dates:'Oct 2018 – Jun 2020'},
-        { role:'Test Lead', org:'HCL Technologies', city:'Chennai', dates:'Mar 2025 – Apr 2025'}
-      ],
-      awards:['Sky Stars – Thanks Award (Apr 2023)','Champ Award (Feb 2022)','First Time‑Right Team Award (Mar 2021)','Rising Star 2020 (Mar 2021)'],
-      education:[{degree:'BCA', org:'Kalasalingam Academy of Research and Education', dates:'Jul 2015 – Apr 2018', notes:'First Class with Distinction; 2nd place product demo'}]
-    };
-    document.getElementById('downloadJson').addEventListener('click',()=>{
-      const blob = new Blob([JSON.stringify(resumeJson,null,2)],{type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = Object.assign(document.createElement('a'),{href:url,download:'resume.json'});
-      a.click(); URL.revokeObjectURL(url);
-    });
-
-    // --- Skill filters toggle experience ---
-    const filters = document.getElementById('skillFilters');
-    const items = Array.from(document.querySelectorAll('#timeline .summary-card'));
-    filters?.addEventListener('click',(e)=>{
-      const btn = e.target.closest('button[data-filter]');
-      if(!btn) return;
-      const tag = btn.dataset.filter;
-      items.forEach(el=>{
-        if(tag==='all'){ el.hidden=false; return; }
-        const tags = (el.getAttribute('data-tags')||'').split(/\s+/);
-        el.hidden = !tags.includes(tag);
+// "Particle" star – lightweight canvas-free decoration
+const StarField = ({ active }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!active || !ref.current) return;
+    const el = ref.current;
+    const makeStar = () => {
+      const s = document.createElement("span");
+      const size = Math.random() * 3 + 2; // 2–5px
+      const left = Math.random() * 100;
+      s.className = "pointer-events-none absolute bg-white/90 rounded-full shadow";
+      Object.assign(s.style, {
+        width: `${size}px`,
+        height: `${size}px`,
+        left: `${left}%`,
+        top: `-6px`,
+        opacity: 0.95,
+        filter: "drop-shadow(0 0 6px rgba(255,255,255,0.6))",
+        animation: `fall ${3 + Math.random() * 2}s linear forwards`,
       });
-    });
-
-    // --- Theme switcher ---
-    const root = document.documentElement;
-    const setTheme = (key)=>{
-      root.classList.remove('theme-light','theme-green','theme-rose','theme-amber');
-      if(key==='light') root.classList.add('theme-light');
-      if(key==='green') root.classList.add('theme-green');
-      if(key==='rose') root.classList.add('theme-rose');
-      if(key==='amber') root.classList.add('theme-amber');
-      localStorage.setItem('resumeTheme',key);
+      el.appendChild(s);
+      setTimeout(() => s.remove(), 6000);
     };
-    document.querySelectorAll('.swatch').forEach(s=>s.addEventListener('click',()=>setTheme(s.dataset.theme)));
-    setTheme(localStorage.getItem('resumeTheme')||'indigo');
+    const id = setInterval(makeStar, 400);
+    return () => clearInterval(id);
+  }, [active]);
+  return (
+    <div ref={ref} aria-hidden className="absolute inset-0 overflow-hidden select-none" />
+  );
+};
 
-    // Back to top subtle behavior on hash
-    document.getElementById('backToTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-  </script>
-</body>
-</html>
+// Shared section shell
+const Section = ({ id, title, children, defaultOpen = true }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <section id={id} className="group rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur p-5 md:p-7 shadow-sm hover:shadow-md transition-shadow">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between text-left"
+        aria-expanded={open}
+      >
+        <h2 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-3">
+          <Sparkles className="size-5 md:size-6" /> {title}
+        </h2>
+        <ChevronDown className={cx("size-5 transition-transform", open ? "rotate-180" : "rotate-0")} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.45 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-5 md:pt-6">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+};
+
+// Print helpers
+const PrintButtons = ({ name = "resume" }) => (
+  <div className="flex gap-2 print:hidden">
+    <button
+      onClick={() => window.print()}
+      className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5"
+    >
+      <Printer className="size-4" /> Print
+    </button>
+    <a
+      href="#"
+      onClick={(e) => { e.preventDefault(); const blob = new Blob([document.documentElement.outerHTML], { type: "text/html" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `${name}.html`; a.click(); URL.revokeObjectURL(url); }}
+      className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5"
+    >
+      <Download className="size-4" /> Save HTML
+    </a>
+  </div>
+);
+
+// Tiny typewriter effect
+const useTypewriter = (text, speed = 35) => {
+  const [out, setOut] = useState("");
+  useEffect(() => {
+    setOut("");
+    let i = 0;
+    const id = setInterval(() => {
+      setOut(prev => prev + text[i]);
+      i += 1;
+      if (i >= text.length) clearInterval(id);
+    }, speed);
+    return () => clearInterval(id);
+  }, [text, speed]);
+  return out;
+};
+
+// Demo data – replace with your own
+const SKILL_DATA = [
+  { year: "2019", skills: 20 },
+  { year: "2020", skills: 35 },
+  { year: "2021", skills: 50 },
+  { year: "2022", skills: 65 },
+  { year: "2023", skills: 78 },
+  { year: "2024", skills: 88 },
+  { year: "2025", skills: 95 },
+];
+
+const CHIP = ({ children }) => (
+  <span className="inline-flex items-center rounded-full border border-black/10 dark:border-white/10 px-3 py-1 text-xs md:text-sm tracking-tight">
+    {children}
+  </span>
+);
+
+const NavLink = ({ href, children }) => (
+  <a href={href} className="px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-sm md:text-base">
+    {children}
+  </a>
+);
+
+export default function InteractiveResume() {
+  // Theme
+  const [dark, setDark] = useState(true);
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+  }, [dark]);
+
+  // Fun stars on hover in hero
+  const [stars, setStars] = useState(false);
+
+  // Dynamic tagline
+  const statements = useMemo(() => [
+    "Molecular Physics → OLED/TADF → Product Impact",
+    "SDET & QA Automation • TypeScript • WDIO • Cucumber",
+    "Personal Finance Nerd • App Builder • UI Minimalist",
+  ], []);
+  const [ix, setIx] = useState(0);
+  const typed = useTypewriter(statements[ix], 24);
+  useEffect(() => {
+    const id = setInterval(() => setIx((i) => (i + 1) % statements.length), 4000);
+    return () => clearInterval(id);
+  }, [statements.length]);
+
+  // Reduce animations when printing
+  useEffect(() => {
+    const handler = () => document.body.classList.add("printing");
+    const after = () => document.body.classList.remove("printing");
+    window.addEventListener("beforeprint", handler);
+    window.addEventListener("afterprint", after);
+    return () => { window.removeEventListener("beforeprint", handler); window.removeEventListener("afterprint", after); };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-rose-50 to-amber-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-900 text-zinc-900 dark:text-zinc-100">
+      <style>{`
+        @media print {
+          html, body { background: white !important; }
+          .print:hidden { display: none !important; }
+          .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; }
+          .bg-white\/70, .dark\:bg-zinc-900\/70, .backdrop-blur { background: transparent !important; backdrop-filter:none !important; }
+          a[href^="#"]::after { content: ""; }
+        }
+        @keyframes fall { to { transform: translateY(120vh); opacity: 0; } }
+      `}</style>
+
+      {/* Top bar */}
+      <header className="sticky top-0 z-40 backdrop-blur bg-white/60 dark:bg-zinc-950/40 border-b border-black/5 dark:border-white/10">
+        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
+          <nav className="flex items-center gap-1">
+            <NavLink href="#about">About</NavLink>
+            <NavLink href="#skills">Skills</NavLink>
+            <NavLink href="#experience">Experience</NavLink>
+            <NavLink href="#projects">Projects</NavLink>
+            <NavLink href="#contact">Contact</NavLink>
+          </nav>
+          <div className="flex items-center gap-2">
+            <PrintButtons name="interactive-resume" />
+            <button
+              onClick={() => setDark(d => !d)}
+              className="rounded-xl border border-black/10 dark:border-white/10 p-2 hover:bg-black/5 dark:hover:bg-white/5"
+              aria-label="Toggle theme"
+            >
+              {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <section
+        onMouseEnter={() => setStars(true)}
+        onMouseLeave={() => setStars(false)}
+        className="relative"
+      >
+        <StarField active={stars} />
+        <div className="mx-auto max-w-6xl px-4 pt-12 pb-10 md:pt-16 md:pb-14">
+          <div className="grid md:grid-cols-[1.2fr,0.8fr] gap-6 items-center">
+            <div>
+              <motion.h1
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ type: "spring", duration: 0.6 }}
+                className="text-3xl md:text-5xl font-extrabold tracking-tight"
+              >
+                Prasannamani Govindharaj
+              </motion.h1>
+              <p className="mt-2 md:mt-3 text-base md:text-lg text-zinc-700 dark:text-zinc-300">
+                PhD Candidate • Molecular Physics (OLED/TADF) • SDET & Automation • Product-minded Engineer
+              </p>
+              <p className="mt-4 md:mt-5 text-lg md:text-2xl font-medium">
+                {typed}<span className="opacity-50">▌</span>
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <CHIP>TypeScript</CHIP>
+                <CHIP>WDIO + Cucumber</CHIP>
+                <CHIP>Q‑Chem / TDDFT</CHIP>
+                <CHIP>Flutter (proto)</CHIP>
+                <CHIP>Personal Finance</CHIP>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3 text-sm">
+                <a className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5" href="mailto:prasanna@example.com"><Mail className="size-4"/> Email</a>
+                <a className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5" href="tel:+919999999999"><Phone className="size-4"/> Call</a>
+                <a className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5" href="https://github.com/username" target="_blank" rel="noreferrer"><Github className="size-4"/> GitHub</a>
+                <a className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5" href="https://linkedin.com/in/username" target="_blank" rel="noreferrer"><Linkedin className="size-4"/> LinkedIn</a>
+                <span className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2"><MapPin className="size-4"/> Chennai, IN</span>
+              </div>
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", duration: 0.6, delay: 0.05 }}
+              className="relative aspect-square rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-gradient-to-br from-indigo-500/30 via-fuchsia-500/30 to-amber-500/30"
+            >
+              <div className="absolute inset-0 grid place-items-center">
+                <motion.div
+                  whileHover={{ rotate: -2, scale: 1.02 }}
+                  className="rounded-2xl p-6 md:p-8 bg-white/50 dark:bg-zinc-900/50 border border-black/10 dark:border-white/10 backdrop-blur"
+                >
+                  <div className="text-5xl md:text-6xl font-black tracking-tight">PG</div>
+                  <div className="mt-2 text-xs uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Interactive Résumé</div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <main className="mx-auto max-w-6xl px-4 pb-20 grid gap-5 md:gap-6">
+        <Section id="about" title="About">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 text-sm md:text-base leading-7 text-zinc-700 dark:text-zinc-300">
+              Product‑minded researcher and SDET blending OLED/TADF photophysics with pragmatic automation. I enjoy translating complex systems into delightful, reliable user experiences. Currently finishing a PhD and building a minimalist finance app on the side.
+            </div>
+            <div className="grid gap-2 text-sm">
+              <div className="flex items-center gap-2"><Star className="size-4"/> 5+ years across research & QA automation</div>
+              <div className="flex items-center gap-2"><Star className="size-4"/> Mentored junior engineers & students</div>
+              <div className="flex items-center gap-2"><Star className="size-4"/> Public speaking & tech writing</div>
+            </div>
+          </div>
+        </Section>
+
+        <Section id="skills" title="Skills & Trajectory">
+          <div className="grid md:grid-cols-2 gap-6 items-center">
+            <div className="space-y-3">
+              {[
+                { label: "TypeScript / Node", v: 92 },
+                { label: "WebdriverIO + Cucumber", v: 90 },
+                { label: "Automation Design", v: 88 },
+                { label: "Q‑Chem / TDDFT", v: 75 },
+                { label: "Data Viz & Comms", v: 84 },
+              ].map((s, i) => (
+                <div key={s.label} className="group">
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span>{s.label}</span>
+                    <span className="tabular-nums text-zinc-500">{s.v}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${s.v}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.9, delay: i * 0.05 }}
+                      className="h-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-500"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="h-48 md:h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={SKILL_DATA} margin={{ top: 6, right: 12, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.5} />
+                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.1} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="year" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                  <YAxis hide domain={[0, 100]} />
+                  <Tooltip contentStyle={{ background: "rgba(24,24,27,0.9)", border: "none", color: "white" }} labelClassName="text-xs" />
+                  <Area type="monotone" dataKey="skills" stroke="#6366f1" fill="url(#grad)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </Section>
+
+        <Section id="experience" title="Experience">
+          <div className="grid gap-4">
+            {[
+              {
+                role: "Application Engineer (Offer)",
+                org: "QNA Technology (Semiconductor / QD)",
+                time: "Oct 2025 → ",
+                points: [
+                  "Translating customer needs into experiments & product improvements",
+                  "Building internal tooling for data capture & QC",
+                ],
+              },
+              {
+                role: "SDET / QA Automation",
+                org: "Veterinary-care enterprise platform",
+                time: "2023–2025",
+                points: [
+                  "Migrated Protractor → WDIO + Cucumber + TS",
+                  "API-first automation, ReportPortal metrics",
+                ],
+              },
+              {
+                role: "PhD Researcher (OLED/TADF)",
+                org: "Lodz University of Technology",
+                time: "2019–2025",
+                points: [
+                  "Emitter design, host–matrix effects, delayed fluorescence",
+                  "International collabs: BIU, MPIP, Kyushu",
+                ],
+              },
+            ].map((e, idx) => (
+              <motion.div
+                key={e.role}
+                initial={{ y: 16, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ type: "spring", duration: 0.6, delay: idx * 0.05 }}
+                className="rounded-2xl border border-black/5 dark:border-white/10 p-4 md:p-5"
+              >
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <div className="text-base md:text-lg font-semibold">{e.role}</div>
+                    <div className="text-sm text-zinc-500">{e.org}</div>
+                  </div>
+                  <div className="text-xs md:text-sm text-zinc-500">{e.time}</div>
+                </div>
+                <ul className="mt-3 list-disc pl-5 text-sm md:text-base space-y-1">
+                  {e.points.map(p => <li key={p}>{p}</li>)}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </Section>
+
+        <Section id="projects" title="Projects (click to reveal)" defaultOpen={false}>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              {
+                title: "Money Manager (cross‑device)",
+                blurb: "Offline‑first personal finance with AI insights, travel‑mode & family sharing.",
+                tags: ["Flutter", "Local-first", "LLM insights"],
+                link: "#",
+              },
+              {
+                title: "Automation Toolkit",
+                blurb: "CLI + templates for WDIO+Cucumber+TS projects; opinionated linting & utils.",
+                tags: ["TypeScript", "Node", "QA"],
+                link: "#",
+              },
+              {
+                title: "OLED Photophysics Viz",
+                blurb: "NTO / ΔE_ST / RISC visualizations from Q‑Chem outputs with clean UI.",
+                tags: ["Python", "Plotly", "Science"],
+                link: "#",
+              },
+              {
+                title: "Tiny UI Library",
+                blurb: "Composable Tailwind components for dashboards and admin panels.",
+                tags: ["React", "Tailwind"],
+                link: "#",
+              },
+            ].map((p, idx) => (
+              <motion.a
+                key={p.title}
+                href={p.link}
+                target={p.link?.startsWith("http") ? "_blank" : undefined}
+                rel="noreferrer"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.05 }}
+                className="group rounded-2xl border border-black/5 dark:border-white/10 p-5 hover:-translate-y-0.5 hover:shadow-md transition-all bg-white/60 dark:bg-zinc-900/60"
+              >
+                <div className="text-base md:text-lg font-semibold tracking-tight">{p.title}</div>
+                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{p.blurb}</p>
+                <div className="mt-3 flex flex-wrap gap-2">{p.tags.map(t => <CHIP key={t}>{t}</CHIP>)}</div>
+              </motion.a>
+            ))}
+          </div>
+        </Section>
+
+        <Section id="contact" title="Contact & Links">
+          <div className="grid md:grid-cols-3 gap-6 items-start">
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2"><Mail className="size-4"/> prasanna@example.com</div>
+              <div className="flex items-center gap-2"><Phone className="size-4"/> +91 99999 99999</div>
+              <div className="flex items-center gap-2"><Globe className="size-4"/> prasanna.dev</div>
+            </div>
+            <form
+              onSubmit={(e) => { e.preventDefault(); alert("Thanks! I'll get back to you."); }}
+              className="md:col-span-2 grid gap-3"
+            >
+              <div className="grid md:grid-cols-2 gap-3">
+                <input required placeholder="Your name" className="rounded-xl border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"/>
+                <input required type="email" placeholder="Email" className="rounded-xl border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"/>
+              </div>
+              <textarea required placeholder="Message" rows={4} className="rounded-xl border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"/>
+              <div className="flex items-center gap-3">
+                <button className="rounded-xl px-4 py-2 border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5">Send</button>
+                <span className="text-xs text-zinc-500">(Demo only – replace with a real endpoint)</span>
+              </div>
+            </form>
+          </div>
+        </Section>
+      </main>
+
+      <footer className="border-t border-black/5 dark:border-white/10 py-10 text-center text-xs text-zinc-500">
+        Crafted with <span className="inline-block animate-pulse">❤</span> · Keyboard: 1–5 to jump sections · © {new Date().getFullYear()}
+      </footer>
+
+      {/* Keyboard shortcuts */}
+      <ShortcutHelp />
+    </div>
+  );
+}
+
+function ShortcutHelp() {
+  useEffect(() => {
+    const links = ["#about", "#skills", "#experience", "#projects", "#contact"];
+    const onKey = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      const n = parseInt(e.key, 10);
+      if (!Number.isNaN(n) && n >= 1 && n <= links.length) {
+        document.querySelector(links[n - 1])?.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+  return null;
+}
