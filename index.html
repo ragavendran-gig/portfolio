@@ -1,485 +1,321 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Download, Mail, Phone, MapPin, Github, Linkedin, Globe, Sparkles, Printer, Moon, Sun, Star, ChevronDown } from "lucide-react";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ragavendran S – Interactive Résumé</title>
+  <meta name="description" content="Ragavendran S · SDET Automation Engineer · Portfolio Resume" />
 
-/**
- * Interactive Resume – single-file React component.
- * - Playful but professional animations
- * - Theme toggle (light/dark)
- * - Fun Easter egg (shooting stars on hover)
- * - Skill chart (Recharts)
- * - Collapsible sections + keyboard navigation
- * - Print-friendly (@media print) with auto-collapse and simplified colors
- *
- * How to use on GitHub Pages quickly:
- * 1) Create a new repo (e.g., interactive-resume) with a Vite + React setup
- *    `npm create vite@latest resume -- --template react` then replace App.jsx with this file’s default export usage
- * 2) Add Tailwind CSS (tailwind docs) and include the classes as in this file
- * 3) Deploy to Pages (Settings → Pages) or use `npm run deploy` via gh-pages
- */
+  <!-- Tailwind CSS CDN (no build) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
 
-// Small helper for class concatenation
-const cx = (...a) => a.filter(Boolean).join(" ");
+  <style>
+    :root { --ring: 0 0 0 8px rgba(99,102,241,0.15) } /* indigo */
+    @keyframes floaty { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-6px)} }
+    @keyframes shimmer { 0%{ background-position: 0% 50% } 100%{ background-position: 200% 50% } }
+    @keyframes fall { to { transform: translateY(120vh); opacity: 0; } }
+    .glass { backdrop-filter: blur(12px) }
+    .card { transition: transform .25s ease, box-shadow .25s ease }
+    .card:hover { transform: translateY(-2px) }
 
-// "Particle" star – lightweight canvas-free decoration
-const StarField = ({ active }) => {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!active || !ref.current) return;
-    const el = ref.current;
+    /* Print-friendly */
+    @media print {
+      html, body { background: #fff !important; }
+      .no-print { display:none !important }
+      .glass, .shadow, .shadow-md, .shadow-lg { box-shadow:none !important }
+      .border-black\/5, .dark\:border-white\/10 { border-color:#e5e7eb !important }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-rose-50 to-amber-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-900 text-zinc-900 dark:text-zinc-100 selection:bg-indigo-500/20">
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-40 glass bg-white/70 dark:bg-zinc-950/50 border-b border-black/5 dark:border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <nav class="hidden sm:flex items-center text-sm gap-1">
+        <a href="#about" class="px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5">About</a>
+        <a href="#skills" class="px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5">Skills</a>
+        <a href="#experience" class="px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5">Experience</a>
+        <a href="#awards" class="px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5">Awards</a>
+        <a href="#education" class="px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5">Education</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button id="printBtn" class="no-print border rounded-xl px-3 py-2 text-xs hover:bg-black/5 dark:hover:bg-white/5">Print</button>
+        <button id="themeBtn" class="no-print border rounded-xl px-3 py-2 text-xs hover:bg-black/5 dark:hover:bg-white/5">Toggle Theme</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="hero" class="relative overflow-hidden">
+    <div id="starfield" aria-hidden class="absolute inset-0 pointer-events-none"></div>
+    <div class="max-w-6xl mx-auto px-4 pt-10 pb-12 md:pt-16 md:pb-16">
+      <div class="grid md:grid-cols-[1.2fr,0.8fr] gap-6 items-center">
+        <div>
+          <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight">Ragavendran S</h1>
+          <p class="mt-2 md:mt-3 text-base md:text-lg text-zinc-700 dark:text-zinc-300">SDET Automation Engineer · Java · REST Assured · Selenium · Cucumber · Playwright · Appium</p>
+          <p class="mt-4 md:mt-6 text-lg md:text-2xl font-semibold"><span id="typewriter"></span><span class="opacity-50">▌</span></p>
+          <div class="mt-6 flex flex-wrap gap-2 text-xs">
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-white/60 dark:bg-zinc-900/60">Java</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-white/60 dark:bg-zinc-900/60">REST Assured</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-white/60 dark:bg-zinc-900/60">Selenium</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-white/60 dark:bg-zinc-900/60">Cucumber / BDD</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-white/60 dark:bg-zinc-900/60">Jenkins</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-white/60 dark:bg-zinc-900/60">GitHub Actions</span>
+          </div>
+        </div>
+        <div class="relative aspect-square rounded-2xl border border-black/5 dark:border-white/10 bg-gradient-to-br from-indigo-500/30 via-fuchsia-500/30 to-amber-500/30 grid place-items-center shadow-md card">
+          <div class="rounded-2xl p-6 md:p-8 bg-white/60 dark:bg-zinc-900/60 border border-black/10 dark:border-white/10 glass">
+            <div class="text-5xl md:text-6xl font-black tracking-tight">RS</div>
+            <div class="mt-2 text-[10px] uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Interactive Résumé</div>
+          </div>
+          <div class="absolute -top-2 -right-2 px-3 py-1 text-[11px] rounded-full bg-white/70 dark:bg-zinc-900/70 border border-black/10 dark:border-white/10 animate-[floaty_6s_ease-in-out_infinite]">Open to Roles</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="max-w-6xl mx-auto px-4 pb-20 grid gap-6">
+    <!-- About -->
+    <section id="about" class="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 p-5 md:p-7 glass card">
+      <h2 class="text-xl md:text-2xl font-semibold tracking-tight">About</h2>
+      <p class="mt-3 text-sm md:text-base leading-7 text-zinc-700 dark:text-zinc-300">Experienced SDET specializing in functional, API, and regression testing. Passionate about eliminating toil through automation and delivering resilient releases. Adept with Java, REST Assured, Selenium, BDD, and CI/CD (Jenkins, GitHub Actions). Comfortable leading initiatives, mentoring, and collaborating in Agile environments.</p>
+    </section>
+
+    <!-- Skills with animated bars -->
+    <section id="skills" class="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 p-5 md:p-7 glass card">
+      <h2 class="text-xl md:text-2xl font-semibold tracking-tight">Skills</h2>
+      <div class="grid md:grid-cols-2 gap-6 mt-4">
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between text-sm mb-1"><span>Java</span><span class="text-zinc-500">90%</span></div>
+            <div class="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden"><div data-bar="90" class="h-full w-0 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-500"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-sm mb-1"><span>REST Assured / API</span><span class="text-zinc-500">88%</span></div>
+            <div class="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden"><div data-bar="88" class="h-full w-0 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-500"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-sm mb-1"><span>Selenium / Playwright</span><span class="text-zinc-500">85%</span></div>
+            <div class="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden"><div data-bar="85" class="h-full w-0 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-500"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-sm mb-1"><span>BDD (Cucumber)</span><span class="text-zinc-500">82%</span></div>
+            <div class="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden"><div data-bar="82" class="h-full w-0 bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-500"></div></div>
+          </div>
+        </div>
+        <div class="text-sm grid gap-2">
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">Postman</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">Jenkins</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">GitHub Actions</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">GitLab</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">Maven</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">JMeter</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">Appium</span>
+            <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">Playwright</span>
+          </div>
+          <p class="text-zinc-600 dark:text-zinc-300">Agile (Scrum/Kanban) · SIT · Regression · Cross Browser/Platform · DevOps Collaboration</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience – collapsible timeline cards -->
+    <section id="experience" class="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 p-5 md:p-7 glass card">
+      <h2 class="text-xl md:text-2xl font-semibold tracking-tight">Experience</h2>
+      <ol class="mt-4 relative border-s border-black/10 dark:border-white/10">
+        <li class="ms-6 py-4">
+          <div class="absolute -start-1.5 mt-1.5 size-3 rounded-full bg-indigo-500 shadow"></div>
+          <button class="w-full text-left group" data-acc>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-semibold">Test Lead – HCL Technologies</div>
+                <div class="text-xs text-zinc-500">Mar 2025 – Apr 2025</div>
+              </div>
+              <span class="text-xs opacity-70 group-aria-expanded:hidden">Show</span>
+              <span class="text-xs opacity-70 hidden group-aria-expanded:block">Hide</span>
+            </div>
+          </button>
+          <div class="mt-2 hidden" data-acc-panel>
+            <ul class="list-disc pl-5 text-sm">
+              <li>Led testing initiatives and coordinated releases (short-term engagement).</li>
+            </ul>
+          </div>
+        </li>
+        <li class="ms-6 py-4">
+          <div class="absolute -start-1.5 mt-1.5 size-3 rounded-full bg-indigo-500 shadow"></div>
+          <button class="w-full text-left group" data-acc>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-semibold">SDET Automation Engineer III – Comcast India</div>
+                <div class="text-xs text-zinc-500">Oct 2023 – Feb 2025</div>
+              </div>
+              <span class="text-xs opacity-70 group-aria-expanded:hidden">Show</span>
+              <span class="text-xs opacity-70 hidden group-aria-expanded:block">Hide</span>
+            </div>
+          </button>
+          <div class="mt-2 hidden" data-acc-panel>
+            <ul class="list-disc pl-5 text-sm">
+              <li>Increased team efficiency by ~40% via a reporting dashboard.</li>
+              <li>Streamlined third‑party coordination, cutting follow‑ups by ~90%.</li>
+              <li>Mentored 15 engineers; reduced SPOF risk.</li>
+            </ul>
+          </div>
+        </li>
+        <li class="ms-6 py-4">
+          <div class="absolute -start-1.5 mt-1.5 size-3 rounded-full bg-indigo-500 shadow"></div>
+          <button class="w-full text-left group" data-acc>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-semibold">SDET Automation Engineer II – Comcast India</div>
+                <div class="text-xs text-zinc-500">Jun 2022 – Sep 2023</div>
+              </div>
+              <span class="text-xs opacity-70 group-aria-expanded:hidden">Show</span>
+              <span class="text-xs opacity-70 hidden group-aria-expanded:block">Hide</span>
+            </div>
+          </button>
+          <div class="mt-2 hidden" data-acc-panel>
+            <ul class="list-disc pl-5 text-sm">
+              <li>Improved API/UI automation (Java, REST Assured, Cucumber/Gherkin) to cover ~50% functionality.</li>
+              <li>Built Power Automate flows to reduce repetitive tasks by ~90% for 25‑member team.</li>
+            </ul>
+          </div>
+        </li>
+        <li class="ms-6 py-4">
+          <div class="absolute -start-1.5 mt-1.5 size-3 rounded-full bg-indigo-500 shadow"></div>
+          <button class="w-full text-left group" data-acc>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-semibold">Infosys Ltd – Test Engineer / Sr Test Executive / Testing Executive</div>
+                <div class="text-xs text-zinc-500">Oct 2018 – Jun 2022</div>
+              </div>
+              <span class="text-xs opacity-70 group-aria-expanded:hidden">Show</span>
+              <span class="text-xs opacity-70 hidden group-aria-expanded:block">Hide</span>
+            </div>
+          </button>
+          <div class="mt-2 hidden" data-acc-panel>
+            <ul class="list-disc pl-5 text-sm">
+              <li>UI automation with Selenium WebDriver for functional/regression test suites.</li>
+              <li>Maintained CI/CD via Git/GitHub; optimized test pipelines.</li>
+              <li>Contributed across STLC: planning, design, execution.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Awards – animated pill row -->
+    <section id="awards" class="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 p-5 md:p-7 glass card">
+      <h2 class="text-xl md:text-2xl font-semibold tracking-tight">Awards</h2>
+      <div class="mt-3 flex flex-wrap gap-2 text-xs">
+        <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-gradient-to-r from-amber-100 to-rose-100 dark:from-zinc-800 dark:to-zinc-800 animate-[shimmer_4s_linear_infinite] bg-[length:200%_100%]">Sky Stars – Thanks Award</span>
+        <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">Champ Award – Excel Metrics</span>
+        <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">First Time Right Team Award (2022)</span>
+        <span class="px-3 py-1 rounded-full border border-black/10 dark:border-white/10">Rising Star 2020 Award</span>
+      </div>
+    </section>
+
+    <!-- Education -->
+    <section id="education" class="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 p-5 md:p-7 glass card">
+      <h2 class="text-xl md:text-2xl font-semibold tracking-tight">Education</h2>
+      <p class="mt-3 text-sm">Bachelor of Computer Applications – Kalasalingam Academy of Research and Education (2015 – 2018). First Class with Distinction.</p>
+      <h3 class="mt-4 text-sm font-medium">Certifications</h3>
+      <ul class="mt-2 list-disc pl-5 text-sm space-y-1">
+        <li>ISTQB® Certified Tester – Foundation Level</li>
+        <li>Power BI – PwC Switzerland</li>
+        <li>Data Science & Big Data Analytics – Dell EMC</li>
+        <li>Innovation & Creativity – Harvard ManageMentor</li>
+        <li>Python for Data Science – IBM</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="text-center text-xs text-zinc-500 py-8 border-t border-black/5 dark:border-white/10">
+    <p>© 2025 Ragavendran S · Interactive Résumé · <button id="saveBtn" class="underline no-print">Save as HTML</button></p>
+  </footer>
+
+  <script>
+    // Theme toggle & print
+    document.getElementById('themeBtn').onclick = () => document.documentElement.classList.toggle('dark');
+    document.getElementById('printBtn').onclick = () => window.print();
+    document.getElementById('saveBtn').onclick = (e) => {
+      e.preventDefault();
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('a'), { href: url, download: 'ragavendran-resume.html' });
+      a.click(); URL.revokeObjectURL(url);
+    };
+
+    // Simple starfield on hero hover (no canvas)
+    const starHost = document.getElementById('starfield');
     const makeStar = () => {
-      const s = document.createElement("span");
+      const s = document.createElement('span');
       const size = Math.random() * 3 + 2; // 2–5px
-      const left = Math.random() * 100;
-      s.className = "pointer-events-none absolute bg-white/90 rounded-full shadow";
+      s.className = 'pointer-events-none absolute bg-white/90 rounded-full shadow';
       Object.assign(s.style, {
-        width: `${size}px`,
-        height: `${size}px`,
-        left: `${left}%`,
-        top: `-6px`,
-        opacity: 0.95,
-        filter: "drop-shadow(0 0 6px rgba(255,255,255,0.6))",
-        animation: `fall ${3 + Math.random() * 2}s linear forwards`,
+        width: size+'px', height: size+'px',
+        left: Math.random() * 100 + '%', top: '-6px', opacity: .95,
+        filter: 'drop-shadow(0 0 6px rgba(255,255,255,.6))',
+        animation: `fall ${3 + Math.random()*2}s linear forwards`
       });
-      el.appendChild(s);
+      starHost.appendChild(s);
       setTimeout(() => s.remove(), 6000);
     };
-    const id = setInterval(makeStar, 400);
-    return () => clearInterval(id);
-  }, [active]);
-  return (
-    <div ref={ref} aria-hidden className="absolute inset-0 overflow-hidden select-none" />
-  );
-};
+    let starTimer;
+    const hero = document.getElementById('hero');
+    hero.addEventListener('mouseenter', () => { starTimer = setInterval(makeStar, 300); });
+    hero.addEventListener('mouseleave', () => { clearInterval(starTimer); });
 
-// Shared section shell
-const Section = ({ id, title, children, defaultOpen = true }) => {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <section id={id} className="group rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-zinc-900/70 backdrop-blur p-5 md:p-7 shadow-sm hover:shadow-md transition-shadow">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between text-left"
-        aria-expanded={open}
-      >
-        <h2 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-3">
-          <Sparkles className="size-5 md:size-6" /> {title}
-        </h2>
-        <ChevronDown className={cx("size-5 transition-transform", open ? "rotate-180" : "rotate-0")} />
-      </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            key="body"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ type: "spring", bounce: 0, duration: 0.45 }}
-            className="overflow-hidden"
-          >
-            <div className="pt-5 md:pt-6">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
-  );
-};
+    // Tiny typewriter with rotating statements
+    const lines = [
+      'Automation that removes toil',
+      'API + UI Testing · Java · REST Assured',
+      'DevOps-aware QA · Jenkins · GitHub Actions'
+    ];
+    let li = 0, ti = 0, typing = true;
+    const tw = document.getElementById('typewriter');
+    function tick(){
+      const text = lines[li];
+      tw.textContent = typing ? text.slice(0, ++ti) : text.slice(0, --ti);
+      if (typing && ti === text.length) { typing = false; setTimeout(tick, 1200); return; }
+      if (!typing && ti === 0) { typing = true; li = (li+1)%lines.length; }
+      setTimeout(tick, typing ? 28 : 18);
+    }
+    tick();
 
-// Print helpers
-const PrintButtons = ({ name = "resume" }) => (
-  <div className="flex gap-2 print:hidden">
-    <button
-      onClick={() => window.print()}
-      className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5"
-    >
-      <Printer className="size-4" /> Print
-    </button>
-    <a
-      href="#"
-      onClick={(e) => { e.preventDefault(); const blob = new Blob([document.documentElement.outerHTML], { type: "text/html" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `${name}.html`; a.click(); URL.revokeObjectURL(url); }}
-      className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5"
-    >
-      <Download className="size-4" /> Save HTML
-    </a>
-  </div>
-);
-
-// Tiny typewriter effect
-const useTypewriter = (text, speed = 35) => {
-  const [out, setOut] = useState("");
-  useEffect(() => {
-    setOut("");
-    let i = 0;
-    const id = setInterval(() => {
-      setOut(prev => prev + text[i]);
-      i += 1;
-      if (i >= text.length) clearInterval(id);
-    }, speed);
-    return () => clearInterval(id);
-  }, [text, speed]);
-  return out;
-};
-
-// Demo data – replace with your own
-const SKILL_DATA = [
-  { year: "2019", skills: 20 },
-  { year: "2020", skills: 35 },
-  { year: "2021", skills: 50 },
-  { year: "2022", skills: 65 },
-  { year: "2023", skills: 78 },
-  { year: "2024", skills: 88 },
-  { year: "2025", skills: 95 },
-];
-
-const CHIP = ({ children }) => (
-  <span className="inline-flex items-center rounded-full border border-black/10 dark:border-white/10 px-3 py-1 text-xs md:text-sm tracking-tight">
-    {children}
-  </span>
-);
-
-const NavLink = ({ href, children }) => (
-  <a href={href} className="px-3 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 text-sm md:text-base">
-    {children}
-  </a>
-);
-
-export default function InteractiveResume() {
-  // Theme
-  const [dark, setDark] = useState(true);
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-  }, [dark]);
-
-  // Fun stars on hover in hero
-  const [stars, setStars] = useState(false);
-
-  // Dynamic tagline
-  const statements = useMemo(() => [
-    "Molecular Physics → OLED/TADF → Product Impact",
-    "SDET & QA Automation • TypeScript • WDIO • Cucumber",
-    "Personal Finance Nerd • App Builder • UI Minimalist",
-  ], []);
-  const [ix, setIx] = useState(0);
-  const typed = useTypewriter(statements[ix], 24);
-  useEffect(() => {
-    const id = setInterval(() => setIx((i) => (i + 1) % statements.length), 4000);
-    return () => clearInterval(id);
-  }, [statements.length]);
-
-  // Reduce animations when printing
-  useEffect(() => {
-    const handler = () => document.body.classList.add("printing");
-    const after = () => document.body.classList.remove("printing");
-    window.addEventListener("beforeprint", handler);
-    window.addEventListener("afterprint", after);
-    return () => { window.removeEventListener("beforeprint", handler); window.removeEventListener("afterprint", after); };
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-rose-50 to-amber-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-900 text-zinc-900 dark:text-zinc-100">
-      <style>{`
-        @media print {
-          html, body { background: white !important; }
-          .print:hidden { display: none !important; }
-          .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; }
-          .bg-white\/70, .dark\:bg-zinc-900\/70, .backdrop-blur { background: transparent !important; backdrop-filter:none !important; }
-          a[href^="#"]::after { content: ""; }
+    // Animate skill bars on view
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.width = e.target.dataset.bar + '%';
+          e.target.style.transition = 'width .9s ease';
+          io.unobserve(e.target);
         }
-        @keyframes fall { to { transform: translateY(120vh); opacity: 0; } }
-      `}</style>
+      });
+    }, { threshold: .4 });
+    document.querySelectorAll('[data-bar]').forEach(el => io.observe(el));
 
-      {/* Top bar */}
-      <header className="sticky top-0 z-40 backdrop-blur bg-white/60 dark:bg-zinc-950/40 border-b border-black/5 dark:border-white/10">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
-          <nav className="flex items-center gap-1">
-            <NavLink href="#about">About</NavLink>
-            <NavLink href="#skills">Skills</NavLink>
-            <NavLink href="#experience">Experience</NavLink>
-            <NavLink href="#projects">Projects</NavLink>
-            <NavLink href="#contact">Contact</NavLink>
-          </nav>
-          <div className="flex items-center gap-2">
-            <PrintButtons name="interactive-resume" />
-            <button
-              onClick={() => setDark(d => !d)}
-              className="rounded-xl border border-black/10 dark:border-white/10 p-2 hover:bg-black/5 dark:hover:bg-white/5"
-              aria-label="Toggle theme"
-            >
-              {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
-            </button>
-          </div>
-        </div>
-      </header>
+    // Accessible accordion for Experience
+    document.querySelectorAll('[data-acc]').forEach(btn => {
+      btn.setAttribute('aria-expanded', 'false');
+      const panel = btn.parentElement.querySelector('[data-acc-panel]');
+      btn.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!open));
+        panel.classList.toggle('hidden');
+      });
+    });
 
-      {/* Hero */}
-      <section
-        onMouseEnter={() => setStars(true)}
-        onMouseLeave={() => setStars(false)}
-        className="relative"
-      >
-        <StarField active={stars} />
-        <div className="mx-auto max-w-6xl px-4 pt-12 pb-10 md:pt-16 md:pb-14">
-          <div className="grid md:grid-cols-[1.2fr,0.8fr] gap-6 items-center">
-            <div>
-              <motion.h1
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ type: "spring", duration: 0.6 }}
-                className="text-3xl md:text-5xl font-extrabold tracking-tight"
-              >
-                Prasannamani Govindharaj
-              </motion.h1>
-              <p className="mt-2 md:mt-3 text-base md:text-lg text-zinc-700 dark:text-zinc-300">
-                PhD Candidate • Molecular Physics (OLED/TADF) • SDET & Automation • Product-minded Engineer
-              </p>
-              <p className="mt-4 md:mt-5 text-lg md:text-2xl font-medium">
-                {typed}<span className="opacity-50">▌</span>
-              </p>
-              <div className="mt-6 flex flex-wrap gap-2">
-                <CHIP>TypeScript</CHIP>
-                <CHIP>WDIO + Cucumber</CHIP>
-                <CHIP>Q‑Chem / TDDFT</CHIP>
-                <CHIP>Flutter (proto)</CHIP>
-                <CHIP>Personal Finance</CHIP>
-              </div>
-              <div className="mt-6 flex flex-wrap gap-3 text-sm">
-                <a className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5" href="mailto:prasanna@example.com"><Mail className="size-4"/> Email</a>
-                <a className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5" href="tel:+919999999999"><Phone className="size-4"/> Call</a>
-                <a className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5" href="https://github.com/username" target="_blank" rel="noreferrer"><Github className="size-4"/> GitHub</a>
-                <a className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5" href="https://linkedin.com/in/username" target="_blank" rel="noreferrer"><Linkedin className="size-4"/> LinkedIn</a>
-                <span className="inline-flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 px-3 py-2"><MapPin className="size-4"/> Chennai, IN</span>
-              </div>
-            </div>
-
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", duration: 0.6, delay: 0.05 }}
-              className="relative aspect-square rounded-2xl overflow-hidden border border-black/5 dark:border-white/10 bg-gradient-to-br from-indigo-500/30 via-fuchsia-500/30 to-amber-500/30"
-            >
-              <div className="absolute inset-0 grid place-items-center">
-                <motion.div
-                  whileHover={{ rotate: -2, scale: 1.02 }}
-                  className="rounded-2xl p-6 md:p-8 bg-white/50 dark:bg-zinc-900/50 border border-black/10 dark:border-white/10 backdrop-blur"
-                >
-                  <div className="text-5xl md:text-6xl font-black tracking-tight">PG</div>
-                  <div className="mt-2 text-xs uppercase tracking-widest text-zinc-600 dark:text-zinc-400">Interactive Résumé</div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <main className="mx-auto max-w-6xl px-4 pb-20 grid gap-5 md:gap-6">
-        <Section id="about" title="About">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 text-sm md:text-base leading-7 text-zinc-700 dark:text-zinc-300">
-              Product‑minded researcher and SDET blending OLED/TADF photophysics with pragmatic automation. I enjoy translating complex systems into delightful, reliable user experiences. Currently finishing a PhD and building a minimalist finance app on the side.
-            </div>
-            <div className="grid gap-2 text-sm">
-              <div className="flex items-center gap-2"><Star className="size-4"/> 5+ years across research & QA automation</div>
-              <div className="flex items-center gap-2"><Star className="size-4"/> Mentored junior engineers & students</div>
-              <div className="flex items-center gap-2"><Star className="size-4"/> Public speaking & tech writing</div>
-            </div>
-          </div>
-        </Section>
-
-        <Section id="skills" title="Skills & Trajectory">
-          <div className="grid md:grid-cols-2 gap-6 items-center">
-            <div className="space-y-3">
-              {[
-                { label: "TypeScript / Node", v: 92 },
-                { label: "WebdriverIO + Cucumber", v: 90 },
-                { label: "Automation Design", v: 88 },
-                { label: "Q‑Chem / TDDFT", v: 75 },
-                { label: "Data Viz & Comms", v: 84 },
-              ].map((s, i) => (
-                <div key={s.label} className="group">
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span>{s.label}</span>
-                    <span className="tabular-nums text-zinc-500">{s.v}%</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${s.v}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.9, delay: i * 0.05 }}
-                      className="h-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-amber-500"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="h-48 md:h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={SKILL_DATA} margin={{ top: 6, right: 12, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.5} />
-                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.1} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="year" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                  <YAxis hide domain={[0, 100]} />
-                  <Tooltip contentStyle={{ background: "rgba(24,24,27,0.9)", border: "none", color: "white" }} labelClassName="text-xs" />
-                  <Area type="monotone" dataKey="skills" stroke="#6366f1" fill="url(#grad)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </Section>
-
-        <Section id="experience" title="Experience">
-          <div className="grid gap-4">
-            {[
-              {
-                role: "Application Engineer (Offer)",
-                org: "QNA Technology (Semiconductor / QD)",
-                time: "Oct 2025 → ",
-                points: [
-                  "Translating customer needs into experiments & product improvements",
-                  "Building internal tooling for data capture & QC",
-                ],
-              },
-              {
-                role: "SDET / QA Automation",
-                org: "Veterinary-care enterprise platform",
-                time: "2023–2025",
-                points: [
-                  "Migrated Protractor → WDIO + Cucumber + TS",
-                  "API-first automation, ReportPortal metrics",
-                ],
-              },
-              {
-                role: "PhD Researcher (OLED/TADF)",
-                org: "Lodz University of Technology",
-                time: "2019–2025",
-                points: [
-                  "Emitter design, host–matrix effects, delayed fluorescence",
-                  "International collabs: BIU, MPIP, Kyushu",
-                ],
-              },
-            ].map((e, idx) => (
-              <motion.div
-                key={e.role}
-                initial={{ y: 16, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ type: "spring", duration: 0.6, delay: idx * 0.05 }}
-                className="rounded-2xl border border-black/5 dark:border-white/10 p-4 md:p-5"
-              >
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <div>
-                    <div className="text-base md:text-lg font-semibold">{e.role}</div>
-                    <div className="text-sm text-zinc-500">{e.org}</div>
-                  </div>
-                  <div className="text-xs md:text-sm text-zinc-500">{e.time}</div>
-                </div>
-                <ul className="mt-3 list-disc pl-5 text-sm md:text-base space-y-1">
-                  {e.points.map(p => <li key={p}>{p}</li>)}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
-        </Section>
-
-        <Section id="projects" title="Projects (click to reveal)" defaultOpen={false}>
-          <div className="grid md:grid-cols-2 gap-4">
-            {[
-              {
-                title: "Money Manager (cross‑device)",
-                blurb: "Offline‑first personal finance with AI insights, travel‑mode & family sharing.",
-                tags: ["Flutter", "Local-first", "LLM insights"],
-                link: "#",
-              },
-              {
-                title: "Automation Toolkit",
-                blurb: "CLI + templates for WDIO+Cucumber+TS projects; opinionated linting & utils.",
-                tags: ["TypeScript", "Node", "QA"],
-                link: "#",
-              },
-              {
-                title: "OLED Photophysics Viz",
-                blurb: "NTO / ΔE_ST / RISC visualizations from Q‑Chem outputs with clean UI.",
-                tags: ["Python", "Plotly", "Science"],
-                link: "#",
-              },
-              {
-                title: "Tiny UI Library",
-                blurb: "Composable Tailwind components for dashboards and admin panels.",
-                tags: ["React", "Tailwind"],
-                link: "#",
-              },
-            ].map((p, idx) => (
-              <motion.a
-                key={p.title}
-                href={p.link}
-                target={p.link?.startsWith("http") ? "_blank" : undefined}
-                rel="noreferrer"
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.05 }}
-                className="group rounded-2xl border border-black/5 dark:border-white/10 p-5 hover:-translate-y-0.5 hover:shadow-md transition-all bg-white/60 dark:bg-zinc-900/60"
-              >
-                <div className="text-base md:text-lg font-semibold tracking-tight">{p.title}</div>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{p.blurb}</p>
-                <div className="mt-3 flex flex-wrap gap-2">{p.tags.map(t => <CHIP key={t}>{t}</CHIP>)}</div>
-              </motion.a>
-            ))}
-          </div>
-        </Section>
-
-        <Section id="contact" title="Contact & Links">
-          <div className="grid md:grid-cols-3 gap-6 items-start">
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center gap-2"><Mail className="size-4"/> prasanna@example.com</div>
-              <div className="flex items-center gap-2"><Phone className="size-4"/> +91 99999 99999</div>
-              <div className="flex items-center gap-2"><Globe className="size-4"/> prasanna.dev</div>
-            </div>
-            <form
-              onSubmit={(e) => { e.preventDefault(); alert("Thanks! I'll get back to you."); }}
-              className="md:col-span-2 grid gap-3"
-            >
-              <div className="grid md:grid-cols-2 gap-3">
-                <input required placeholder="Your name" className="rounded-xl border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"/>
-                <input required type="email" placeholder="Email" className="rounded-xl border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"/>
-              </div>
-              <textarea required placeholder="Message" rows={4} className="rounded-xl border border-black/10 dark:border-white/10 bg-transparent px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"/>
-              <div className="flex items-center gap-3">
-                <button className="rounded-xl px-4 py-2 border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5">Send</button>
-                <span className="text-xs text-zinc-500">(Demo only – replace with a real endpoint)</span>
-              </div>
-            </form>
-          </div>
-        </Section>
-      </main>
-
-      <footer className="border-t border-black/5 dark:border-white/10 py-10 text-center text-xs text-zinc-500">
-        Crafted with <span className="inline-block animate-pulse">❤</span> · Keyboard: 1–5 to jump sections · © {new Date().getFullYear()}
-      </footer>
-
-      {/* Keyboard shortcuts */}
-      <ShortcutHelp />
-    </div>
-  );
-}
-
-function ShortcutHelp() {
-  useEffect(() => {
-    const links = ["#about", "#skills", "#experience", "#projects", "#contact"];
-    const onKey = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-      const n = parseInt(e.key, 10);
-      if (!Number.isNaN(n) && n >= 1 && n <= links.length) {
-        document.querySelector(links[n - 1])?.scrollIntoView({ behavior: "smooth" });
+    // Keyboard shortcuts: 1–5 jump to sections
+    const ids = ['#about','#skills','#experience','#awards','#education'];
+    window.addEventListener('keydown', (e) => {
+      if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+      const n = parseInt(e.key, 10); if (!Number.isNaN(n) && n>=1 && n<=ids.length) {
+        document.querySelector(ids[n-1])?.scrollIntoView({ behavior: 'smooth' });
       }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-  return null;
-}
+    });
+  </script>
+</body>
+</html>
