@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ragavendran S — SDET / Automation Engineer</title>
+  <meta name="description" content="Interactive online résumé for Ragavendran S — SDET / Automation Engineer. Skills in Java, REST Assured, Selenium, Cucumber, Playwright, Appium, CI/CD and more." />
+  <meta property="og:title" content="Ragavendran S — SDET / Automation Engineer" />
+  <meta property="og:description" content="Interactive, colorful résumé hosted on GitHub Pages." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#4f46e5" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b1020;           /* default: Indigo Night */
+      --panel:#0f1530;
+      --card:#131a3a;
+      --text:#f4f6ff;
+      --muted:#c6c9f4;
+      --accent:#7c3aed;        /* primary */
+      --accent-2:#22d3ee;      /* secondary */
+      --chip:#222a55;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    /* Light theme variables (auto switched) */
+    .theme-light{
+      --bg:#f8fafc; --panel:#ffffff; --card:#ffffff; --text:#0b1324; --muted:#475569; --chip:#f1f5f9;
+      --accent:#2563eb; --accent-2:#06b6d4;
+    }
+    /* Alternate accent presets */
+    .theme-green{ --accent:#16a34a; --accent-2:#22d3ee; }
+    .theme-rose{ --accent:#e11d48; --accent-2:#8b5cf6; }
+    .theme-amber{ --accent:#f59e0b; --accent-2:#06b6d4; }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(1200px 800px at 85% -10%,rgba(124,58,237,.18),transparent),radial-gradient(900px 600px at -10% 10%,rgba(34,211,238,.14),transparent),var(--bg);color:var(--text);line-height:1.6}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .container{max-width:1000px;margin:0 auto;padding:28px}
+    header{position:sticky;top:0;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,0)),var(--panel);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08);z-index:10}
+    .topbar{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:12px 28px}
+    .brand{display:flex;gap:14px;align-items:center}
+    .avatar{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-weight:800;box-shadow:var(--shadow)}
+    .nav{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 12px;border-radius:999px;background:var(--chip);color:var(--text);border:1px solid rgba(255,255,255,.07);cursor:pointer;font-size:13px}
+    .chip[aria-current="page"], .chip.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white}
+
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;margin-top:18px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);border-radius:20px;box-shadow:var(--shadow)}
+    .hero .card{padding:22px}
+    .title{font-size:38px;line-height:1.15;margin:6px 0 8px}
+    .subtitle{font-size:18px;color:var(--muted);margin:0 0 8px}
+    .contact{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:var(--card);color:var(--text);cursor:pointer}
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
+
+    .section{margin:26px 0;padding:22px}
+    .section h2{margin:0 0 8px;font-size:22px}
+    .section p.lead{margin:0 0 12px;color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+    .col-12{grid-column:span 12}
+    .col-6{grid-column:span 6}
+
+    @media (max-width:860px){.hero{grid-template-columns:1fr}.col-6{grid-column:span 12}}
+
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--chip);border:1px solid rgba(255,255,255,.08);font-size:12px;margin:4px 6px 0 0}
+    .list{display:flex;flex-wrap:wrap;margin-top:8px}
+
+    .timeline{position:relative;margin:8px 0}
+    .timeline::before{content:"";position:absolute;top:0;bottom:0;left:10px;width:2px;background:linear-gradient(var(--accent),transparent)}
+    .tl-item{position:relative;padding-left:28px;margin:16px 0}
+    .tl-item::before{content:"";position:absolute;left:4px;top:6px;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+    .role{font-weight:700}
+    .org{opacity:.9}
+    .meta{font-size:12px;color:var(--muted)}
+    details.summary-card{background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.08)}
+    details.summary-card[open]{outline:1.5px solid color-mix(in oklab, var(--accent) 40%, transparent)}
+    summary{cursor:pointer;list-style:none}
+    summary::-webkit-details-marker{display:none}
+
+    .skillbar{height:10px;background:#101634;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+    .skillbar > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+    .footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:24px 0;color:var(--muted)}
+    .theme-switch{display:flex;gap:8px;align-items:center}
+    .swatch{width:26px;height:26px;border-radius:8px;cursor:pointer;border:2px solid rgba(255,255,255,.2)}
+    .swatch.indigo{background:linear-gradient(135deg,#7c3aed,#22d3ee)}
+    .swatch.green{background:linear-gradient(135deg,#16a34a,#22d3ee)}
+    .swatch.rose{background:linear-gradient(135deg,#e11d48,#8b5cf6)}
+    .swatch.amber{background:linear-gradient(135deg,#f59e0b,#06b6d4)}
+    .swatch.light{background:#fff}
+
+    /* Print to PDF friendly */
+    @media print{
+      header,.theme-switch,.btn,.nav{display:none!important}
+      body{background:#fff;color:#000}
+      .card,.section{border:1px solid #ddd}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="avatar" aria-hidden>RS</div>
+        <div>
+          <div style="font-weight:800;letter-spacing:.2px">Ragavendran S</div>
+          <div class="meta">SDET Senior Engineer · Automation Specialist</div>
+        </div>
+      </div>
+      <nav class="nav" id="mainNav" aria-label="Primary">
+        <button class="chip active" data-target="about" aria-current="page">About</button>
+        <button class="chip" data-target="skills">Skills</button>
+        <button class="chip" data-target="experience">Experience</button>
+        <button class="chip" data-target="awards">Awards</button>
+        <button class="chip" data-target="education">Education</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="card">
+        <h1 class="title">Hi, I’m <span style="background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent">Ragavendran</span></h1>
+        <p class="subtitle">I streamline QA with thoughtful automation across API, UI and mobile — reducing toil and accelerating delivery.</p>
+        <div class="contact">
+          <a class="btn" href="tel:+918870206167">📞 +91 887-020-6167</a>
+          <a class="btn" href="mailto:iamragavendrans@gmail.com">✉️ iamragavendrans@gmail.com</a>
+          <a class="btn primary" href="https://www.linkedin.com/in/iamragavendrans" target="_blank" rel="noopener">in LinkedIn</a>
+          <button class="btn" id="copyEmail">📋 Copy Email</button>
+        </div>
+        <p style="margin:10px 0 0;color:var(--muted)">Open to roles in SDET, Test Automation, and Tools Engineering.</p>
+      </div>
+      <div class="card">
+        <div class="section" style="margin:0;padding:0">
+          <h2>Highlights</h2>
+          <ul style="margin:8px 0 0 18px">
+            <li>Boosted team efficiency by ~40% via reporting dashboards.</li>
+            <li>Eliminated repetitive vendor follow-ups with automation (~90% effort cut).</li>
+            <li>Mentored 15 engineers; SME for enterprise QA automation.</li>
+          </ul>
+          <div class="list" style="margin-top:14px">
+            <span class="pill">API & UI Automation</span>
+            <span class="pill">BDD (Cucumber)</span>
+            <span class="pill">Java · REST Assured</span>
+            <span class="pill">Selenium · Playwright · Appium</span>
+            <span class="pill">CI/CD · GitHub Actions</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section card">
+      <h2>About</h2>
+      <p class="lead">Experienced SDET who streamlines processes and reduces manual work via automation, with strong delivery against functional requirements and cross-team collaboration.</p>
+    </section>
+
+    <section id="skills" class="section card" hidden>
+      <h2>Skills</h2>
+      <div class="grid">
+        <div class="col-6">
+          <h3>Languages & Tools</h3>
+          <div class="list">
+            <span class="pill">Java</span>
+            <span class="pill">REST Assured</span>
+            <span class="pill">Postman</span>
+            <span class="pill">SQL</span>
+            <span class="pill">Selenium</span>
+            <span class="pill">Cucumber/Gherkin</span>
+            <span class="pill">Playwright</span>
+            <span class="pill">Appium</span>
+            <span class="pill">TestNG</span>
+            <span class="pill">Maven</span>
+            <span class="pill">Jenkins</span>
+            <span class="pill">GitHub / GitLab</span>
+            <span class="pill">GitHub Actions</span>
+            <span class="pill">JMeter</span>
+            <span class="pill">Spring Boot</span>
+            <span class="pill">Microservices</span>
+            <span class="pill">BrowserStack</span>
+            <span class="pill">Power Automate</span>
+          </div>
+        </div>
+        <div class="col-6">
+          <h3>Proficiency</h3>
+          <div style="margin:10px 0">
+            <div>API Automation</div>
+            <div class="skillbar"><span style="width:92%"></span></div>
+          </div>
+          <div style="margin:10px 0">
+            <div>UI / Mobile Automation</div>
+            <div class="skillbar"><span style="width:88%"></span></div>
+          </div>
+          <div style="margin:10px 0">
+            <div>CI/CD & DevOps Collaboration</div>
+            <div class="skillbar"><span style="width:84%"></span></div>
+          </div>
+          <div style="margin:10px 0">
+            <div>Test Strategy & Mentoring</div>
+            <div class="skillbar"><span style="width:86%"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:18px">Focus Filters</h3>
+      <div class="list" id="skillFilters">
+        <button class="pill" data-filter="api">API</button>
+        <button class="pill" data-filter="ui">UI</button>
+        <button class="pill" data-filter="mobile">Mobile</button>
+        <button class="pill" data-filter="ci">CI/CD</button>
+        <button class="pill" data-filter="bdd">BDD</button>
+        <button class="pill" data-filter="all">Show All</button>
+      </div>
+    </section>
+
+    <section id="experience" class="section card" hidden>
+      <h2>Experience</h2>
+      <div class="timeline" id="timeline">
+        <details class="summary-card tl-item" open data-tags="api ui ci bdd">
+          <summary>
+            <div class="role">SDET Automation Engineer III</div>
+            <div class="org">Comcast India Engineering Center · Chennai</div>
+            <div class="meta">Oct 2023 – Feb 2025</div>
+          </summary>
+          <ul style="margin-left:18px">
+            <li>Raised team efficiency ~40% with a reporting dashboard for third‑party issues and release notes.</li>
+            <li>Automated external coordination; reduced manual follow‑ups by ~90%.</li>
+            <li>Delivered new/major features on time; mentored 15 engineers and acted as SME.</li>
+          </ul>
+        </details>
+
+        <details class="summary-card tl-item" data-tags="api ui bdd">
+          <summary>
+            <div class="role">SDET Automation Engineer II</div>
+            <div class="org">Comcast India Engineering Center · Chennai</div>
+            <div class="meta">Jun 2022 – Sep 2023</div>
+          </summary>
+          <ul style="margin-left:18px">
+            <li>Modernized legacy framework; decreased failure rates; migrated 120+ instances.</li>
+            <li>Java + REST Assured + Cucumber covering ~50% of co‑dependent scenarios.</li>
+            <li>Built Power Automate apps; cut routine toil ~90% for a 25‑member team.</li>
+          </ul>
+        </details>
+
+        <details class="summary-card tl-item" data-tags="ui ci">
+          <summary>
+            <div class="role">Test Engineer</div>
+            <div class="org">Infosys · Chennai</div>
+            <div class="meta">Apr 2021 – Jun 2022</div>
+          </summary>
+          <ul style="margin-left:18px">
+            <li>Outperformed manual QA baseline by ~70% via process automations.</li>
+            <li>Improved automation throughput by ~12% through log‑validation function.</li>
+            <li>Maintained Git/GitHub and CI/CD operations.</li>
+          </ul>
+        </details>
+
+        <details class="summary-card tl-item" data-tags="ui">
+          <summary>
+            <div class="role">Senior Testing Executive</div>
+            <div class="org">Infosys · Chennai</div>
+            <div class="meta">Jul 2020 – Mar 2021</div>
+          </summary>
+          <ul style="margin-left:18px">
+            <li>Web UI automation for functional and regression testing using Selenium.</li>
+            <li>Defect lifecycle in Jira; authored scripts and RTM documents.</li>
+          </ul>
+        </details>
+
+        <details class="summary-card tl-item" data-tags="ui">
+          <summary>
+            <div class="role">Testing Executive</div>
+            <div class="org">Infosys · Chennai</div>
+            <div class="meta">Oct 2018 – Jun 2020</div>
+          </summary>
+          <ul style="margin-left:18px">
+            <li>Owned ~40% of STLC activities: planning, design, closure of test cases.</li>
+            <li>Manual testing & ALM test‑suite management; KT and shadow support.</li>
+          </ul>
+        </details>
+
+        <details class="summary-card tl-item" data-tags="ci">
+          <summary>
+            <div class="role">Test Lead</div>
+            <div class="org">HCL Technologies · Chennai</div>
+            <div class="meta">Mar 2025 – Apr 2025</div>
+          </summary>
+          <ul style="margin-left:18px">
+            <li>Short‑term leadership engagement; coordinated delivery and quality gates.</li>
+          </ul>
+        </details>
+      </div>
+    </section>
+
+    <section id="awards" class="section card" hidden>
+      <h2>Awards</h2>
+      <ul style="margin-left:18px">
+        <li>Sky Stars – Thanks Award (Apr 2023)</li>
+        <li>Champ Award (Feb 2022)</li>
+        <li>First Time‑Right Team Award (Mar 2021)</li>
+        <li>Rising Star 2020 (Mar 2021)</li>
+      </ul>
+    </section>
+
+    <section id="education" class="section card" hidden>
+      <h2>Education</h2>
+      <p><strong>BCA — Kalasalingam Academy of Research and Education</strong> (Jul 2015 – Apr 2018)<br>
+      First Class with Distinction; 2nd place product demo.</p>
+    </section>
+
+    <div class="footer">
+      <div>
+        <button class="btn" id="printPdf">🖨️ Save as PDF</button>
+        <button class="btn" id="downloadJson">⬇️ Export JSON</button>
+        <a class="btn" href="#about" id="backToTop">⤴ Back to top</a>
+      </div>
+      <div class="theme-switch" aria-label="Theme switcher">
+        <span class="meta">Theme:</span>
+        <div class="swatch indigo" data-theme="indigo" title="Indigo"></div>
+        <div class="swatch green" data-theme="green" title="Green"></div>
+        <div class="swatch rose" data-theme="rose" title="Rose"></div>
+        <div class="swatch amber" data-theme="amber" title="Amber"></div>
+        <div class="swatch light" data-theme="light" title="Light"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // --- Simple tab nav ---
+    const nav = document.getElementById('mainNav');
+    const sections = Array.from(document.querySelectorAll('main .section'));
+    nav.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-target]');
+      if(!btn) return;
+      nav.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+      const id = btn.dataset.target;
+      sections.forEach(s=>s.hidden = s.id !== id);
+      document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+    });
+
+    // --- Copy email ---
+    document.getElementById('copyEmail').addEventListener('click', async ()=>{
+      await navigator.clipboard.writeText('iamragavendrans@gmail.com');
+      const b = event.target; b.textContent='✅ Copied!'; setTimeout(()=>b.textContent='📋 Copy Email',1300);
+    });
+
+    // --- Print to PDF ---
+    document.getElementById('printPdf').addEventListener('click',()=>window.print());
+
+    // --- Export JSON resume ---
+    const resumeJson = {
+      name: 'Ragavendran S', title: 'SDET / Automation Engineer',
+      location: 'Chennai, India',
+      email: 'iamragavendrans@gmail.com', phone: '+91 8870206167',
+      linkedin: 'https://www.linkedin.com/in/iamragavendrans',
+      summary: 'SDET streamlining QA through automation across API/UI/mobile.',
+      skills: ['Java','REST Assured','Postman','SQL','Selenium','Cucumber','Playwright','Appium','TestNG','Maven','Jenkins','GitHub','GitLab','GitHub Actions','JMeter','Spring Boot','Microservices','BrowserStack','Power Automate'],
+      experience: [
+        { role:'SDET Automation Engineer III', org:'Comcast India Engineering Center', city:'Chennai', dates:'Oct 2023 – Feb 2025', bullets:[
+          'Team efficiency +40% with reporting dashboard',
+          'Automated external coordination (~90% effort cut)',
+          'Mentored 15 engineers; SME'
+        ]},
+        { role:'SDET Automation Engineer II', org:'Comcast India Engineering Center', city:'Chennai', dates:'Jun 2022 – Sep 2023', bullets:[
+          'Modernized framework; migrated 120+ instances',
+          'Java + REST Assured + Cucumber (~50% coverage of co-dependent)',
+          'Power Automate reduced toil ~90%'
+        ]},
+        { role:'Test Engineer', org:'Infosys', city:'Chennai', dates:'Apr 2021 – Jun 2022', bullets:[
+          'Process automations beat manual baseline by ~70%','Log-validation +12% throughput','Owned Git/CI/CD'
+        ]},
+        { role:'Senior Testing Executive', org:'Infosys', city:'Chennai', dates:'Jul 2020 – Mar 2021'},
+        { role:'Testing Executive', org:'Infosys', city:'Chennai', dates:'Oct 2018 – Jun 2020'},
+        { role:'Test Lead', org:'HCL Technologies', city:'Chennai', dates:'Mar 2025 – Apr 2025'}
+      ],
+      awards:['Sky Stars – Thanks Award (Apr 2023)','Champ Award (Feb 2022)','First Time‑Right Team Award (Mar 2021)','Rising Star 2020 (Mar 2021)'],
+      education:[{degree:'BCA', org:'Kalasalingam Academy of Research and Education', dates:'Jul 2015 – Apr 2018', notes:'First Class with Distinction; 2nd place product demo'}]
+    };
+    document.getElementById('downloadJson').addEventListener('click',()=>{
+      const blob = new Blob([JSON.stringify(resumeJson,null,2)],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('a'),{href:url,download:'resume.json'});
+      a.click(); URL.revokeObjectURL(url);
+    });
+
+    // --- Skill filters toggle experience ---
+    const filters = document.getElementById('skillFilters');
+    const items = Array.from(document.querySelectorAll('#timeline .summary-card'));
+    filters?.addEventListener('click',(e)=>{
+      const btn = e.target.closest('button[data-filter]');
+      if(!btn) return;
+      const tag = btn.dataset.filter;
+      items.forEach(el=>{
+        if(tag==='all'){ el.hidden=false; return; }
+        const tags = (el.getAttribute('data-tags')||'').split(/\s+/);
+        el.hidden = !tags.includes(tag);
+      });
+    });
+
+    // --- Theme switcher ---
+    const root = document.documentElement;
+    const setTheme = (key)=>{
+      root.classList.remove('theme-light','theme-green','theme-rose','theme-amber');
+      if(key==='light') root.classList.add('theme-light');
+      if(key==='green') root.classList.add('theme-green');
+      if(key==='rose') root.classList.add('theme-rose');
+      if(key==='amber') root.classList.add('theme-amber');
+      localStorage.setItem('resumeTheme',key);
+    };
+    document.querySelectorAll('.swatch').forEach(s=>s.addEventListener('click',()=>setTheme(s.dataset.theme)));
+    setTheme(localStorage.getItem('resumeTheme')||'indigo');
+
+    // Back to top subtle behavior on hash
+    document.getElementById('backToTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+  </script>
+</body>
+</html>
